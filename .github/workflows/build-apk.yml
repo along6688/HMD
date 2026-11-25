@@ -1,0 +1,48 @@
+name: Build WiFi-Blacklist APK (25.12 aarch64)
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: 安装解压工具
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq zstd
+
+      - name: 下载 OpenWrt 25.12.6 SDK (mediatek-filogic)
+        run: |
+          cd $HOME
+          curl -fL --retry 3 -o sdk.tar.zst https://downloads.openwrt.org/releases/25.12.6/targets/mediatek/filogic/openwrt-sdk-25.12.6-mediatek-filogic_gcc-14.3.0_musl.Linux-x86_64.tar.zst
+          tar -I zstd -xf sdk.tar.zst
+          ls -d $HOME/openwrt-sdk-*
+
+      - name: 解出插件源码
+        run: |
+          cd $HOME
+          SDK=$(ls -d $HOME/openwrt-sdk-* | head -1)
+          MK=$SDK/package/luci-app-wifi-blacklist
+          mkdir -p $MK
+          echo "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" | base64 -d > /tmp/pkg.tgz
+          tar xzf /tmp/pkg.tgz -C $MK
+          find $MK -type f
+
+      - name: 编译 apk 包
+        run: |
+          SDK=$(ls -d $HOME/openwrt-sdk-* | head -1)
+          cd $SDK
+          make package/luci-app-wifi-blacklist/compile -j1 V=s
+
+      - name: 收集 .apk
+        run: |
+          SDK=$(ls -d $HOME/openwrt-sdk-* | head -1)
+          mkdir -p $HOME/out
+          find $SDK/bin/packages -name "*wifi-blacklist*.apk" -exec cp {} $HOME/out/ \;
+          ls -l $HOME/out
+          echo "APK_COUNT=$(ls $HOME/out/*.apk 2>/dev/null | wc -l)" >> $GITHUB_ENV
+
+      - name: 上传固件包
+        uses: actions/upload-artifact@v4
+        with:
+          name: luci-app-wifi-blacklist-apk
+          path: $HOME/out/*.apk
+          retention-days: 30
